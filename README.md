@@ -108,10 +108,7 @@ Carry: 0
 
 ## ⚠️ Notes
 
-* Internally, bits are stored **LSB first**, but input/output is shown normally
 * All logic is built from **NAND gates only**
-* This is a **learning/educational implementation**, not optimized for performance
-
 ---
 
 ## 📁 Project Structure
