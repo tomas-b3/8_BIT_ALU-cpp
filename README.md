@@ -54,16 +54,6 @@ The operation depends on the decoder output:
 
 ---
 
----
-
-## ▶️ How to Run
-
-```bash
-alu.exe
-```
-
----
-
 ## 📥 Input
 
 Inside the code:
