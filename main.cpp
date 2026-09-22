@@ -2,6 +2,7 @@
 #include <string>
 using namespace std;
 
+// Basic logic gates
 bool NAND(bool x, bool y)
 {
     if (x == 1 && y == 1)
@@ -49,21 +50,25 @@ bool NOR(bool x, bool y)
     return rez;
 }
 
+// Half adder
 void HALFADDER(bool x, bool y, bool &sum, bool &carry)
 {
     sum = XOR(x, y);
     carry = AND(x, y);
 }
 
+// Full adder
 void FULLADDER(bool x, bool y, bool CarryIn, bool &sum, bool &CarryOut)
 {
     bool sum1, carry1, carry2;
+
     HALFADDER(x, y, sum1, carry1);
     HALFADDER(sum1, CarryIn, sum, carry2);
 
     CarryOut = OR(carry1, carry2);
 }
 
+// 4-to-1 multiplexer
 bool MUX(bool l1, bool l2, bool l3, bool l4, bool M0, bool M1)
 {
     bool nM0 = NOT(M0);
@@ -88,7 +93,9 @@ bool MUX(bool l1, bool l2, bool l3, bool l4, bool M0, bool M1)
     return rez;
 }
 
-void ONEBITALU(bool A, bool B, bool ENA, bool ENB, bool M0, bool M1, bool CarryIn, bool &CarryOut, bool &Output)
+// One-bit ALU
+void ONEBITALU(bool A, bool B, bool ENA, bool ENB, bool M0, bool M1,
+               bool CarryIn, bool &CarryOut, bool &Output)
 {
     bool A1 = AND(A, ENA);
     bool B1 = AND(B, ENB);
@@ -98,11 +105,13 @@ void ONEBITALU(bool A, bool B, bool ENA, bool ENB, bool M0, bool M1, bool CarryI
     bool notBRez = NOT(B1);
 
     bool sum;
+
     FULLADDER(A1, B1, CarryIn, sum, CarryOut);
 
     Output = MUX(xorRez, orRez, notBRez, sum, M0, M1);
 }
 
+// 3-to-8 decoder
 void DECODER(bool D[3], bool O[8])
 {
     bool D0 = D[0];
@@ -123,6 +132,7 @@ void DECODER(bool D[3], bool O[8])
     O[7] = AND(AND(D0, D1), D2);
 }
 
+// Shift bits left or right depending on ctrl
 void SHIFTER(bool A[8], bool ctrl, bool O[8])
 {
     bool nctrl = NOT(ctrl);
@@ -137,9 +147,11 @@ void SHIFTER(bool A[8], bool ctrl, bool O[8])
     O[7] = OR(AND(0, nctrl), AND(A[6], ctrl));
 }
 
+// Add two 8-bit numbers
 void ADD8(bool A[8], bool B[8], bool O[8], bool &carry)
 {
     bool c1, c2, c3, c4, c5, c6, c7;
+
     FULLADDER(A[0], B[0], 0, O[0], c1);
     FULLADDER(A[1], B[1], c1, O[1], c2);
     FULLADDER(A[2], B[2], c2, O[2], c3);
@@ -150,6 +162,7 @@ void ADD8(bool A[8], bool B[8], bool O[8], bool &carry)
     FULLADDER(A[7], B[7], c7, O[7], carry);
 }
 
+// Subtract two 8-bit numbers
 void SUB8(bool A[8], bool B[8], bool O[8], bool &carry)
 {
     bool one[8] = {1,0,0,0,0,0,0,0};
@@ -164,6 +177,7 @@ void SUB8(bool A[8], bool B[8], bool O[8], bool &carry)
     ADD8(A, temp, O, carry);
 }
 
+// Check if two 8-bit numbers are equal
 void COMPARE(bool A[8], bool B[8], bool &F)
 {
     bool e0 = NOT(XOR(A[0], B[0]));
@@ -186,13 +200,17 @@ void COMPARE(bool A[8], bool B[8], bool &F)
     F = AND(t5, t6);
 }
 
-void ALU8BIT(bool A[8], bool B[8], bool D[3], bool ctrl, bool Out[8], bool& cflag, bool& F)
+// Main 8-bit ALU
+void ALU8BIT(bool A[8], bool B[8], bool D[3], bool ctrl,
+             bool Out[8], bool& cflag, bool& F)
 {
     bool Dec[8];
     DECODER(D, Dec);
 
     bool carry = 0;
-    if (Dec[3]) carry = 1;
+
+    if (Dec[3])
+        carry = 1;
 
     for (int i = 0; i < 8; i++)
     {
@@ -208,6 +226,7 @@ void ALU8BIT(bool A[8], bool B[8], bool D[3], bool ctrl, bool Out[8], bool& cfla
         }
 
         bool Bin = B[i];
+
         if (Dec[3])
         {
             M0 = 1;
@@ -216,21 +235,19 @@ void ALU8BIT(bool A[8], bool B[8], bool D[3], bool ctrl, bool Out[8], bool& cfla
         }
 
         if (Dec[5])
-        {
             SHIFTER(A, ctrl, Out);
-        }
 
         if (Dec[1])
-        {
             COMPARE(A, B, F);
-        }
 
-        ONEBITALU(A[i], Bin, ENA, ENB, M0, M1, carry, carry, Out[i]);
+        ONEBITALU(A[i], Bin, ENA, ENB, M0, M1,
+                  carry, carry, Out[i]);
     }
 
     cflag = carry;
 }
 
+// Convert an 8-character binary string into bits
 void STRINGTOBITS(string s, bool X[8])
 {
     for (int i = 0; i < 8; i++)
@@ -241,6 +258,7 @@ void STRINGTOBITS(string s, bool X[8])
         return;
     }
 
+    // Store the least significant bit at X[0]
     for (int i = 0; i < 8; i++) {
         if (s[7 - i] == '1')
             X[i] = 1;
@@ -249,6 +267,7 @@ void STRINGTOBITS(string s, bool X[8])
     }
 }
 
+// Print the bits in normal binary order
 void PRINTBITS(bool X[8])
 {
     for (int i = 7; i >= 0; i--)
