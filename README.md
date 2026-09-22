@@ -54,12 +54,6 @@ The operation depends on the decoder output:
 
 ---
 
-## ▶️ How to Compile
-
-```bash
-g++ main.cpp -o alu.exe
-```
-
 ---
 
 ## ▶️ How to Run
